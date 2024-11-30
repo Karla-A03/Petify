@@ -8,43 +8,63 @@ class AppDrawer extends StatelessWidget {
         padding: EdgeInsets.zero,
         children: <Widget>[
           DrawerHeader(
-            decoration: BoxDecoration(color: Colors.blue),
-            child: Text(
-              'Menú de Navegación',
-              style: TextStyle(color: Colors.white, fontSize: 24),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  Color(0xFF50C2C9),
+                  Color(0xFF0E5C61),
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+            ),
+            child: Center(
+              child: Text(
+                'Menú Petify',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 26,
+                  fontWeight: FontWeight.bold,
+                  fontFamily: 'ZenKurenaido', // Fuente personalizada
+                ),
+              ),
             ),
           ),
           ListTile(
-            leading: Icon(Icons.home),
-            title: Text('Inicio'),
+            leading: Icon(Icons.pets, color: Color(0xFF50C2C9)),
+            title: Text(
+              'Agrega tu mascota',
+              style: TextStyle(
+                fontSize: 18,
+                fontFamily: 'ZenKurenaido',
+              ),
+            ),
             onTap: () {
               Navigator.pushReplacementNamed(context, '/home');
             },
           ),
           ListTile(
-            leading: Icon(Icons.person),
-            title: Text('Perfil'),
-            onTap: () {
-              Navigator.pushReplacementNamed(context, '/profile');
-            },
-          ),
-          ListTile(
-            leading: Icon(Icons.view_list),
-            title: Text('Vista 1'),
+            leading: Icon(Icons.games, color: Color(0xFF50C2C9)),
+            title: Text(
+              'Juega con tu mascota',
+              style: TextStyle(
+                fontSize: 18,
+                fontFamily: 'ZenKurenaido',
+              ),
+            ),
             onTap: () {
               Navigator.pushReplacementNamed(context, '/vista1');
             },
           ),
           ListTile(
-            leading: Icon(Icons.view_list),
-            title: Text('Vista 2'),
-            onTap: () {
-              Navigator.pushReplacementNamed(context, '/vista2');
-            },
-          ),
-          ListTile(
-            leading: Icon(Icons.logout),
-            title: Text('Cerrar Sesión'),
+            leading: Icon(Icons.logout, color: Color(0xFF50C2C9)),
+            title: Text(
+              'Cerrar Sesión',
+              style: TextStyle(
+                fontSize: 18,
+                fontFamily: 'ZenKurenaido',
+              ),
+            ),
             onTap: () {
               Navigator.pushReplacementNamed(context, '/login');
             },
