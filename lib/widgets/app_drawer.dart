@@ -53,7 +53,7 @@ class AppDrawer extends StatelessWidget {
               ),
             ),
             onTap: () {
-              Navigator.pushReplacementNamed(context, '/vista1');
+              Navigator.pushReplacementNamed(context, '/register_pet');
             },
           ),
           ListTile(

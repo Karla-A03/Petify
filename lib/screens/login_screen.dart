@@ -1,7 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:proyect_final/services/auth_service.dart';
-import '../services/auth_service.dart';
 import 'home_screen.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -12,11 +11,10 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final AuthService _authService = AuthService(); // Instancia del servicio de autenticación
+  final AuthService _authService = AuthService();
 
   double _opacity = 0.0;
 
-  // Función para hacer una animación
   @override
   void initState() {
     super.initState();
@@ -37,7 +35,11 @@ class _LoginScreenState extends State<LoginScreen> {
 
     if (user != null) {
       // Si el login es exitoso, redirigimos al home
-      Navigator.pushReplacementNamed(context, '/home');
+      Navigator.pushReplacementNamed(
+        context,
+        '/home',
+        arguments: user.email, // Pasamos el correo del usuario a la pantalla de inicio
+      );
     } else {
       _showErrorDialog('Error en el inicio de sesión. Intenta nuevamente.');
     }
@@ -250,13 +252,14 @@ class TextoPetify extends StatelessWidget {
   Widget build(BuildContext context) {
     return AnimatedOpacity(
       opacity: _opacity,
-      duration: Duration(milliseconds: 1000), // Tiempo de la animación
+      duration: Duration(milliseconds: 500),
       child: Text(
-        '¡Diviértete con tu Petify!',
+        'Petify\n¡Tu mejor amigo espera por ti!',
+        textAlign: TextAlign.center,
         style: TextStyle(
-          fontSize: 20,
+          fontSize: 18,
+          fontWeight: FontWeight.bold,
           color: Colors.white,
-          fontFamily: 'ZenKurenaido',
         ),
       ),
     );

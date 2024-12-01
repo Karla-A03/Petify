@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_app_check/firebase_app_check.dart';
-
 import 'firebase_options.dart';
 import 'screens/login_screen.dart';
 import 'screens/register_screen.dart';
 import 'screens/home_screen.dart';
 import 'screens/profile_screen.dart';
-import 'screens/vista1_screen.dart';
+import 'screens/register_pet.dart';
 import 'screens/vista2_screen.dart';
 
 Future <void> main() async {
@@ -37,9 +36,9 @@ class MyApp extends StatelessWidget {
       routes: {
         '/login': (context) => LoginScreen(),
         '/register': (context) => RegisterScreen(),
-        '/home': (context) => HomeScreen(),
+        '/home': (context) => HomeScreen(userEmail: ModalRoute.of(context)!.settings.arguments as String), // Pantalla principal, pasando correo del us
         '/profile': (context) => ProfileScreen(),
-        '/vista1': (context) => Vista1Screen(),
+        '/register_pet': (context) => RegisterPetScreen(userEmail: ModalRoute.of(context)!.settings.arguments as String),
         '/vista2': (context) => Vista2Screen(),
       },
     );
