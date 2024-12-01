@@ -1,7 +1,7 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:proyect_final/services/auth_service.dart';  // Asegúrate de importar el servicio
-import 'home_screen.dart';  // Importa la pantalla principal para redirigir después del registro
+import 'package:firebase_auth/firebase_auth.dart';
+import 'login_screen.dart';
+import 'register_pet.dart';  // Importa RegisterPetScreen
 
 class RegisterScreen extends StatefulWidget {
   @override
@@ -9,61 +9,55 @@ class RegisterScreen extends StatefulWidget {
 }
 
 class _RegisterScreenState extends State<RegisterScreen> {
+  final FirebaseAuth _auth = FirebaseAuth.instance;
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final AuthService _authService = AuthService();  // Instancia del servicio de autenticación
 
-  String _errorMessage = '';
-
-  // Función para manejar el registro
-  void _register() async {
-    String email = _emailController.text;
-    String password = _passwordController.text;
-
-    // Llamamos al servicio de autenticación para registrar al usuario
-    User? user = await _authService.registerWithEmailPassword(email, password);
-
-    if (user != null) {
-      // Si el registro es exitoso, redirigimos al home
-      Navigator.pushReplacementNamed(context, '/home');
-    } else {
-      setState(() {
-        _errorMessage = 'Error en el registro. Intenta nuevamente.';
-      });
+  Future<void> _register() async {
+    try {
+      UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
+        email: _emailController.text,
+        password: _passwordController.text,
+      );
+      // Redirigir al usuario a la pantalla para registrar la mascota
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => RegisterPetScreen(userEmail: userCredential.user!.email!)),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error al registrarse: $e')),
+      );
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Registrarse')),
+      appBar: AppBar(title: Text('Registrar Usuario')),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: EdgeInsets.all(16.0),
         child: Column(
-          children: <Widget>[
+          children: [
             TextField(
               controller: _emailController,
-              decoration: InputDecoration(labelText: 'Correo Electrónico'),
+              decoration: InputDecoration(labelText: 'Correo'),
             ),
             TextField(
               controller: _passwordController,
               decoration: InputDecoration(labelText: 'Contraseña'),
               obscureText: true,
             ),
-            SizedBox(height: 20),
             ElevatedButton(
-              onPressed: _register,  // Llama a la función de registro
-              child: Text('Registrarse'),
+              onPressed: _register,
+              child: Text('Registrar'),
             ),
-            SizedBox(height: 10),
-            if (_errorMessage.isNotEmpty)
-              Text(
-                _errorMessage,
-                style: TextStyle(color: Colors.red),
-              ),
             TextButton(
               onPressed: () {
-                Navigator.pushReplacementNamed(context, '/login');
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => LoginScreen()),
+                );
               },
               child: Text('¿Ya tienes cuenta? Inicia sesión'),
             ),
