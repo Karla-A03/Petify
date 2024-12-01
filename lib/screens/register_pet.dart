@@ -16,33 +16,46 @@ class _RegisterPetScreenState extends State<RegisterPetScreen> {
   final _birthdayController = TextEditingController();
   final _descriptionController = TextEditingController();
 
-  String _petName = '';
-  String _birthday = '';
-  String _description = '';
+  bool _isLoading = false;
 
   Future<void> _savePetData() async {
+    setState(() {
+      _isLoading = true;
+    });
+
     try {
-      String petName = _petNameController.text;
-      if (petName.isEmpty) {
+      String petName = _petNameController.text.trim();
+      String birthday = _birthdayController.text.trim();
+      String description = _descriptionController.text.trim();
+
+      if (petName.isEmpty || birthday.isEmpty || description.isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('El nombre de la mascota es obligatorio.')),
+          SnackBar(content: Text('Todos los campos son obligatorios.')),
         );
         return;
       }
 
-      // Guardar la mascota en Firestore
-      await FirebaseFirestore.instance.collection('pets').add({
+      if (!RegExp(r'^\d{4}-\d{2}-\d{2}$').hasMatch(birthday)) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('El formato de la fecha debe ser AAAA-MM-DD.')),
+        );
+        return;
+      }
+
+      await FirebaseFirestore.instance.collection('mascotas').doc(widget.userEmail).set({
         'userEmail': widget.userEmail,
         'petName': petName,
-        'birthday': _birthdayController.text,
-        'description': _descriptionController.text,
-        'level': 1, // Nivel inicial de la mascota
-        'experience': 0, // Experiencia inicial
-        'energy': 100, // Energía inicial
-        'happiness': 100, // Felicidad inicial
+        'birthday': birthday,
+        'description': description,
+        'level': 1,
+        'experience': 0,
+        'energy': 100,
+        'happiness': 100,
       });
 
-      // Navegar a la pantalla de inicio después de guardar los datos
+      // Simula la pantalla de carga por 5 segundos
+      await Future.delayed(Duration(seconds: 2));
+
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => HomeScreen(userEmail: widget.userEmail)),
@@ -51,6 +64,10 @@ class _RegisterPetScreenState extends State<RegisterPetScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error al guardar la mascota: $e')),
       );
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
     }
   }
 
@@ -58,29 +75,28 @@ class _RegisterPetScreenState extends State<RegisterPetScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text('Registrar Mascota')),
-      body: Padding(
+      body: _isLoading
+          ? Center(child: CircularProgressIndicator())
+          : Padding(
         padding: EdgeInsets.all(16.0),
         child: Column(
           children: [
             TextField(
               controller: _petNameController,
-              decoration: InputDecoration(labelText: 'Nombre de la mascota'),
-              onChanged: (value) => _petName = value,
+              decoration: InputDecoration(labelText: 'Nombre de la Mascota'),
             ),
             TextField(
               controller: _birthdayController,
-              decoration: InputDecoration(labelText: 'Fecha de cumpleaños'),
-              onChanged: (value) => _birthday = value,
+              decoration: InputDecoration(labelText: 'Cumpleaños (AAAA-MM-DD)'),
             ),
             TextField(
               controller: _descriptionController,
               decoration: InputDecoration(labelText: 'Descripción'),
-              onChanged: (value) => _description = value,
             ),
             SizedBox(height: 20),
             ElevatedButton(
               onPressed: _savePetData,
-              child: Text('Guardar Mascota'),
+              child: Text('Registrar Mascota'),
             ),
           ],
         ),

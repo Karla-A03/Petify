@@ -1,10 +1,10 @@
 import 'dart:async';
-import 'package:flutter/material.dart';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/material.dart';
 
 class Mascota {
-  String nombre;
+  final String petName;
   int nivel;
   int experiencia;
   int energia;
@@ -14,7 +14,7 @@ class Mascota {
   int maxFelicidad;
 
   Mascota({
-    required this.nombre,
+    required this.petName,
     this.nivel = 1,
     this.experiencia = 0,
     this.energia = 100,
@@ -69,7 +69,7 @@ class Mascota {
 
   Map<String, dynamic> toMap() {
     return {
-      'nombre': nombre,
+      'petName': petName,
       'nivel': nivel,
       'experiencia': experiencia,
       'energia': energia,
@@ -82,115 +82,135 @@ class Mascota {
 
   factory Mascota.fromMap(Map<String, dynamic> map) {
     return Mascota(
-      nombre: map['nombre'],
-      nivel: map['nivel'],
-      experiencia: map['experiencia'],
-      energia: map['energia'],
-      felicidad: map['felicidad'],
-      maxExperiencia: map['maxExperiencia'],
-      maxEnergia: map['maxEnergia'],
-      maxFelicidad: map['maxFelicidad'],
+      petName: map['petName'] ?? 'Default',
+      nivel: map['nivel']?.toInt() ?? 1,
+      experiencia: map['experiencia']?.toInt() ?? 0,
+      energia: map['energia']?.toInt() ?? 100,
+      felicidad: map['felicidad']?.toInt() ?? 100,
+      maxExperiencia: map['maxExperiencia']?.toInt() ?? 100,
+      maxEnergia: map['maxEnergia']?.toInt() ?? 100,
+      maxFelicidad: map['maxFelicidad']?.toInt() ?? 100,
     );
   }
 }
 
 class HomeScreen extends StatefulWidget {
   final String userEmail;
-
-  HomeScreen({required this.userEmail});
+  const HomeScreen({Key? key, required this.userEmail}) : super(key: key);
 
   @override
-  _HomeScreenState createState() => _HomeScreenState();
+  State<HomeScreen> createState() => _HomeScreenState();
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  late Mascota miMascota;
-  late CollectionReference mascotasRef;
+  late StreamSubscription<DocumentSnapshot<Map<String, dynamic>>> _mascotaStream;
+  Mascota? miMascota;
 
   @override
   void initState() {
     super.initState();
-    mascotasRef = FirebaseFirestore.instance.collection('mascotas');
-    _cargarMascota();
+    _mascotaStream = FirebaseFirestore.instance
+        .collection('mascotas')
+        .doc(widget.userEmail)
+        .snapshots()
+        .listen((snapshot) {
+      if (snapshot.exists) {
+        setState(() {
+          miMascota = Mascota.fromMap(snapshot.data()!);
+          miMascota!.iniciarCiclo(); // Inicia el ciclo de la mascota
+        });
+      } else {
+        setState(() {
+          miMascota = null;
+        });
+      }
+    }, onError: (error) {
+      print('Error al obtener los datos de la mascota: $error');
+      setState(() {
+        miMascota = null;
+      });
+    });
   }
 
-  void _cargarMascota() async {
-    DocumentSnapshot docSnapshot = await mascotasRef.doc(widget.userEmail).get();
-    if (docSnapshot.exists) {
-      setState(() {
-        miMascota = Mascota.fromMap(docSnapshot.data() as Map<String, dynamic>);
-        miMascota.iniciarCiclo();
-      });
-    } else {
-      setState(() {
-        miMascota = Mascota(nombre: 'Fluffy');
-        miMascota.iniciarCiclo();
-        _guardarMascota();
-      });
-    }
-  }
-
-  void _guardarMascota() {
-    mascotasRef.doc(widget.userEmail).set(miMascota.toMap());
+  @override
+  void dispose() {
+    _mascotaStream.cancel();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Cuidando a ${miMascota.nombre}')),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              '¡Bienvenido a ${miMascota.nombre}!',
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 20),
-            Text('Nivel: ${miMascota.nivel}'),
-            Text('Experiencia: ${miMascota.experiencia}'),
-            Text('Energía: ${miMascota.energia}'),
-            Text('Felicidad: ${miMascota.felicidad}'),
-            SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () {
-                setState(() {
-                  miMascota.alimentar();
-                  _guardarMascota();
-                });
-              },
-              child: Text('Alimentar a ${miMascota.nombre}'),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                setState(() {
-                  miMascota.dormir();
-                  _guardarMascota();
-                });
-              },
-              child: Text('Dejar que ${miMascota.nombre} duerma'),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                setState(() {
-                  miMascota.jugar();
-                  _guardarMascota();
-                });
-              },
-              child: Text('Jugar con ${miMascota.nombre}'),
-            ),
-          ],
+      appBar: AppBar(title: Text('Bienvenido, ${widget.userEmail}')),
+      body: Center(
+        child: StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+          stream: FirebaseFirestore.instance
+              .collection('mascotas')
+              .doc(widget.userEmail)
+              .snapshots(),
+          builder: (context, snapshot) {
+            if (snapshot.hasError) {
+              return Text('Error: ${snapshot.error}');
+            }
+
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const CircularProgressIndicator();
+            }
+
+            if (!snapshot.hasData || !snapshot.data!.exists) {
+              return const Text('No se encontraron datos de la mascota.');
+            }
+
+            Mascota mascota = Mascota.fromMap(snapshot.data!.data()!);
+
+            return Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text('Nombre de la mascota: ${mascota.petName}'),
+                Text('Nivel: ${mascota.nivel}'),
+                Text('Experiencia: ${mascota.experiencia}/${mascota.maxExperiencia}'),
+                Text('Energía: ${mascota.energia}/${mascota.maxEnergia}'),
+                Text('Felicidad: ${mascota.felicidad}/${mascota.maxFelicidad}'),
+                ElevatedButton(
+                  onPressed: () {
+                    mascota.alimentar();
+                    _guardarMascota(mascota);
+                  },
+                  child: const Text('Alimentar'),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    mascota.jugar();
+                    _guardarMascota(mascota);
+                  },
+                  child: const Text('Jugar'),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    mascota.dormir();
+                    _guardarMascota(mascota);
+                  },
+                  child: const Text('Dormir'),
+                ),
+              ],
+            );
+          },
         ),
       ),
     );
   }
-}
 
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
-  runApp(MaterialApp(
-    home: HomeScreen(userEmail: 'usuario@example.com'),
-  ));
+  Future<void> _guardarMascota(Mascota mascota) async {
+    try {
+      await FirebaseFirestore.instance
+          .collection('mascotas')
+          .doc(widget.userEmail)
+          .update(mascota.toMap());
+    } catch (e) {
+      print('Error al guardar los datos: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error al guardar los datos: $e')),
+      );
+    }
+  }
 }
