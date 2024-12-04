@@ -12,6 +12,14 @@ class Mascota {
   int maxExperiencia;
   int maxEnergia;
   int maxFelicidad;
+  String imagenActual;
+
+
+  static const Map<String, String> imagenesPorAccion = {
+    'alimentar': 'assets/Images/mascota.comiendo.png',
+    'jugar': 'assets/Images/mascota.jugando.png',
+    'dormir': 'assets/Images/mascota.durmiendo.png',
+  };
 
   Mascota({
     required this.petName,
@@ -22,49 +30,36 @@ class Mascota {
     this.maxExperiencia = 100,
     this.maxEnergia = 100,
     this.maxFelicidad = 100,
+    this.imagenActual = 'assets/Images/mascota.principal.png',
   });
 
-  void alimentar() {
-    energia = (energia + 20).clamp(0, maxEnergia);
-  }
-
-  void dormir() {
-    energia = maxEnergia;
-  }
-
-  void jugar() {
-    if (energia > 10) {
-      energia -= 10;
-      felicidad = (felicidad + 15).clamp(0, maxFelicidad);
-      experiencia += 10;
-      _revisarNivel();
+  void realizarAccion(String accion) {
+    switch (accion) {
+      case 'alimentar':
+        energia = (energia + 20).clamp(0, maxEnergia);
+        break;
+      case 'jugar':
+        if (energia > 0) {
+          energia = (energia - 10).clamp(0, maxEnergia);
+          felicidad = (felicidad + 15).clamp(0, maxFelicidad);
+          experiencia += 10;
+        }
+        break;
+      case 'dormir':
+        energia = maxEnergia;
+        break;
     }
-  }
 
-  void _revisarNivel() {
+
     if (experiencia >= maxExperiencia) {
-      experiencia -= maxExperiencia;
       nivel++;
+      experiencia = experiencia - maxExperiencia;
       maxExperiencia += 50;
     }
   }
 
-  void disminuirFelicidad() {
-    felicidad = (felicidad - 5).clamp(0, maxFelicidad);
-  }
-
-  void disminuirEnergia() {
-    energia = (energia - 2).clamp(0, maxEnergia);
-  }
-
-  void iniciarCiclo() {
-    Timer.periodic(Duration(seconds: 5), (timer) {
-      disminuirFelicidad();
-      disminuirEnergia();
-      if (felicidad == 0 && energia == 0) {
-        timer.cancel();
-      }
-    });
+  void cambiarImagen(String accion) {
+    imagenActual = imagenesPorAccion[accion] ?? 'assets/Images/mascota.principal.png';
   }
 
   Map<String, dynamic> toMap() {
@@ -77,19 +72,21 @@ class Mascota {
       'maxExperiencia': maxExperiencia,
       'maxEnergia': maxEnergia,
       'maxFelicidad': maxFelicidad,
+      'imagenActual': imagenActual,
     };
   }
 
   factory Mascota.fromMap(Map<String, dynamic> map) {
     return Mascota(
-      petName: map['petName'] ?? 'Default',
-      nivel: map['nivel']?.toInt() ?? 1,
-      experiencia: map['experiencia']?.toInt() ?? 0,
-      energia: map['energia']?.toInt() ?? 100,
-      felicidad: map['felicidad']?.toInt() ?? 100,
-      maxExperiencia: map['maxExperiencia']?.toInt() ?? 100,
-      maxEnergia: map['maxEnergia']?.toInt() ?? 100,
-      maxFelicidad: map['maxFelicidad']?.toInt() ?? 100,
+      petName: map['petName'] ?? 'Mascota',
+      nivel: map['nivel'] ?? 1,
+      experiencia: map['experiencia'] ?? 0,
+      energia: map['energia'] ?? 100,
+      felicidad: map['felicidad'] ?? 100,
+      maxExperiencia: map['maxExperiencia'] ?? 100,
+      maxEnergia: map['maxEnergia'] ?? 100,
+      maxFelicidad: map['maxFelicidad'] ?? 100,
+      imagenActual: map['imagenActual'] ?? 'assets/Images/mascota.principal.png',
     );
   }
 }
@@ -99,16 +96,22 @@ class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key, required this.userEmail}) : super(key: key);
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
+  State<HomeScreen> createState() => _Vista1ScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
-  late StreamSubscription<DocumentSnapshot<Map<String, dynamic>>> _mascotaStream;
+class _Vista1ScreenState extends State<HomeScreen> {
   Mascota? miMascota;
+  Timer? _timer;
+  late StreamSubscription<
+      DocumentSnapshot<Map<String, dynamic>>> _mascotaStream;
 
   @override
   void initState() {
     super.initState();
+    _cargarMascota();
+  }
+
+  void _cargarMascota() {
     _mascotaStream = FirebaseFirestore.instance
         .collection('mascotas')
         .doc(widget.userEmail)
@@ -117,88 +120,20 @@ class _HomeScreenState extends State<HomeScreen> {
       if (snapshot.exists) {
         setState(() {
           miMascota = Mascota.fromMap(snapshot.data()!);
-          miMascota!.iniciarCiclo(); // Inicia el ciclo de la mascota
         });
       } else {
         setState(() {
           miMascota = null;
         });
       }
-    }, onError: (error) {
-      print('Error al obtener los datos de la mascota: $error');
-      setState(() {
-        miMascota = null;
-      });
     });
   }
 
   @override
   void dispose() {
     _mascotaStream.cancel();
+    _timer?.cancel();
     super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text('Bienvenido, ${widget.userEmail}')),
-      drawer: AppDrawer(userEmail: widget.userEmail), // Integra el menú
-      body: Center(
-        child: StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
-          stream: FirebaseFirestore.instance
-              .collection('mascotas')
-              .doc(widget.userEmail)
-              .snapshots(),
-          builder: (context, snapshot) {
-            if (snapshot.hasError) {
-              return Text('Error: ${snapshot.error}');
-            }
-
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const CircularProgressIndicator();
-            }
-
-            if (!snapshot.hasData || !snapshot.data!.exists) {
-              return const Text('No se encontraron datos de la mascota.');
-            }
-
-            Mascota mascota = Mascota.fromMap(snapshot.data!.data()!);
-
-            return Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text('Nombre de la mascota: ${mascota.petName}'),
-                Text('Nivel: ${mascota.nivel}'),
-                Text('Experiencia: ${mascota.experiencia}/${mascota.maxExperiencia}'),
-                Text('Energía: ${mascota.energia}/${mascota.maxEnergia}'),
-                Text('Felicidad: ${mascota.felicidad}/${mascota.maxFelicidad}'),
-                ElevatedButton(
-                  onPressed: () {
-                    mascota.alimentar();
-                    _guardarMascota(mascota);
-                  },
-                  child: const Text('Alimentar'),
-                ),
-                ElevatedButton(
-                  onPressed: () {
-                    mascota.jugar();
-                    _guardarMascota(mascota);
-                  },
-                  child: const Text('Jugar'),
-                ),
-                ElevatedButton(
-                  onPressed: () {
-                    mascota.dormir();
-                    _guardarMascota(mascota);
-                  },
-                  child: const Text('Dormir'),
-                ),
-              ],
-            );
-          },
-        ),
-      ),
-    );
   }
 
   Future<void> _guardarMascota(Mascota mascota) async {
@@ -208,10 +143,168 @@ class _HomeScreenState extends State<HomeScreen> {
           .doc(widget.userEmail)
           .update(mascota.toMap());
     } catch (e) {
-      print('Error al guardar los datos: $e');
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error al guardar los datos: $e')),
+        SnackBar(content: Text('Error al guardar: $e')),
       );
     }
+  }
+
+  void _accionMascota(String accion) {
+    if (miMascota == null) return;
+
+    _timer?.cancel();
+
+    setState(() {
+      miMascota!.cambiarImagen(accion);
+    });
+
+    Future.delayed(const Duration(milliseconds: 100), () {
+      setState(() {
+        miMascota!.realizarAccion(accion);
+      });
+
+      _timer = Timer(const Duration(seconds: 3), () {
+        setState(() {
+          miMascota!.imagenActual =
+          'assets/Images/mascota.principal.png';
+        });
+
+        _guardarMascota(miMascota!);
+      });
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Mascota', style: TextStyle(fontWeight: FontWeight
+            .bold, color: Colors.white)),
+        backgroundColor: const Color(0xFF00BCD4),
+      ),
+      drawer: AppDrawer(userEmail: widget.userEmail),
+      body: miMascota == null
+          ? const Center(child: CircularProgressIndicator())
+          : SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Text('Nivel: ${miMascota!.nivel}',
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+              const SizedBox(height: 20),
+              Center(
+                child: Container(
+                  width: 150,
+                  height: 150,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(color: Colors.transparent, width: 4),
+                  ),
+                  child: Image.asset(
+                      miMascota!.imagenActual, fit: BoxFit.cover),
+                ),
+              ),
+              const SizedBox(height: 30),
+              _buildStats('Experiencia',
+                  miMascota!.experiencia / miMascota!.maxExperiencia),
+              _buildStats(
+                  'Felicidad', miMascota!.felicidad / miMascota!.maxFelicidad),
+              _buildStats(
+                  'Energía', miMascota!.energia / miMascota!.maxEnergia),
+              const SizedBox(height: 20),
+              _buildActionButtons(),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildStats(String label, double value) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label, style: const TextStyle(
+            fontWeight: FontWeight.bold, color: Color(0xFF00BCD4))),
+        LinearProgressIndicator(value: value,
+            backgroundColor: Colors.grey[300],
+            color: Colors.green),
+        const SizedBox(height: 10),
+      ],
+    );
+  }
+
+  Widget _buildActionButtons() {
+    return Column(
+      children: [
+        ElevatedButton(
+          onPressed: () => _accionMascota('alimentar'),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.white,
+
+            side: BorderSide(color: const Color(0xFF00BCD4), width: 2),
+
+            minimumSize: const Size(150, 60),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: const [
+              Text(
+                'Alimentar',
+                style: TextStyle(color: Color(0xFF00BCD4)),
+              ),
+              Icon(Icons.add, color: Color(0xFF00BCD4)),
+
+            ],
+          ),
+        ),
+        const SizedBox(height: 16),
+        ElevatedButton(
+          onPressed: () => _accionMascota('jugar'),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.white,
+
+            side: BorderSide(color: const Color(0xFF00BCD4), width: 2),
+
+            minimumSize: const Size(150, 60),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: const [
+              Text(
+                'Jugar',
+                style: TextStyle(color: Color(0xFF00BCD4)),
+              ),
+              Icon(Icons.add, color: Color(0xFF00BCD4)),
+
+            ],
+          ),
+        ),
+        const SizedBox(height: 16),
+        ElevatedButton(
+          onPressed: () => _accionMascota('dormir'),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.white,
+
+            side: BorderSide(color: const Color(0xFF00BCD4), width: 2),
+
+            minimumSize: const Size(150, 60),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: const [
+              Text(
+                'Dormir',
+                style: TextStyle(color: Color(0xFF00BCD4)),
+              ),
+              Icon(Icons.add, color: Color(0xFF00BCD4)),
+
+            ],
+          ),
+        ),
+      ],
+    );
   }
 }
