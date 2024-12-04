@@ -254,7 +254,7 @@ class TextoPetify extends StatelessWidget {
       opacity: _opacity,
       duration: Duration(milliseconds: 500),
       child: Text(
-        'Petify\n¡Tu mejor amigo espera por ti!',
+        '¡Tu mejor amigo espera por ti!',
         textAlign: TextAlign.center,
         style: TextStyle(
           fontSize: 18,

@@ -5,9 +5,7 @@ import 'firebase_options.dart';
 import 'screens/login_screen.dart';
 import 'screens/register_screen.dart';
 import 'screens/home_screen.dart';
-import 'screens/profile_screen.dart';
 import 'screens/register_pet.dart';
-import 'screens/vista2_screen.dart';
 
 Future <void> main() async {
   // Asegura que los widgets estén inicializados
@@ -37,9 +35,7 @@ class MyApp extends StatelessWidget {
         '/login': (context) => LoginScreen(),
         '/register': (context) => RegisterScreen(),
         '/home': (context) => HomeScreen(userEmail: ModalRoute.of(context)!.settings.arguments as String), // Pantalla principal, pasando correo del us
-        '/profile': (context) => ProfileScreen(),
         '/register_pet': (context) => RegisterPetScreen(userEmail: ModalRoute.of(context)!.settings.arguments as String),
-        '/vista2': (context) => Vista2Screen(),
       },
     );
   }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import '../widgets/app_drawer.dart';
 import 'home_screen.dart';
 
 class RegisterPetScreen extends StatefulWidget {
@@ -37,12 +38,14 @@ class _RegisterPetScreenState extends State<RegisterPetScreen> {
 
       if (!RegExp(r'^\d{4}-\d{2}-\d{2}$').hasMatch(birthday)) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('El formato de la fecha debe ser AAAA-MM-DD.')),
+          SnackBar(
+              content: Text('El formato de la fecha debe ser AAAA-MM-DD.')),
         );
         return;
       }
 
-      await FirebaseFirestore.instance.collection('mascotas').doc(widget.userEmail).set({
+      await FirebaseFirestore.instance.collection('mascotas').doc(
+          widget.userEmail).set({
         'userEmail': widget.userEmail,
         'petName': petName,
         'birthday': birthday,
@@ -58,7 +61,8 @@ class _RegisterPetScreenState extends State<RegisterPetScreen> {
 
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => HomeScreen(userEmail: widget.userEmail)),
+        MaterialPageRoute(
+            builder: (context) => HomeScreen(userEmail: widget.userEmail)),
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -75,6 +79,7 @@ class _RegisterPetScreenState extends State<RegisterPetScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text('Registrar Mascota')),
+      drawer: AppDrawer(userEmail: widget.userEmail), // Integra el menú
       body: _isLoading
           ? Center(child: CircularProgressIndicator())
           : Padding(

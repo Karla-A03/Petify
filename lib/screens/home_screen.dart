@@ -1,7 +1,7 @@
 import 'dart:async';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import '../widgets/app_drawer.dart';
 
 class Mascota {
   final String petName;
@@ -142,6 +142,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text('Bienvenido, ${widget.userEmail}')),
+      drawer: AppDrawer(userEmail: widget.userEmail), // Integra el menú
       body: Center(
         child: StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
           stream: FirebaseFirestore.instance

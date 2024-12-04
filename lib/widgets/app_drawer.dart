@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 
 class AppDrawer extends StatelessWidget {
+  final String userEmail; // Recibe el correo del usuario
+
+  AppDrawer({required this.userEmail}); // Constructor con el email
+
   @override
   Widget build(BuildContext context) {
     return Drawer(
@@ -25,7 +29,7 @@ class AppDrawer extends StatelessWidget {
                   color: Colors.white,
                   fontSize: 26,
                   fontWeight: FontWeight.bold,
-                  fontFamily: 'ZenKurenaido', // Fuente personalizada
+                  fontFamily: 'ZenKurenaido',
                 ),
               ),
             ),
@@ -40,7 +44,11 @@ class AppDrawer extends StatelessWidget {
               ),
             ),
             onTap: () {
-              Navigator.pushReplacementNamed(context, '/home');
+              Navigator.pushNamed(
+                context,
+                '/register_pet',
+                arguments: userEmail, // Pasa el email al navegar
+              );
             },
           ),
           ListTile(
@@ -53,7 +61,11 @@ class AppDrawer extends StatelessWidget {
               ),
             ),
             onTap: () {
-              Navigator.pushReplacementNamed(context, '/register_pet');
+              Navigator.pushNamed(
+                context,
+                '/home',
+                arguments: userEmail, // Pasa el email al navegar
+              );
             },
           ),
           ListTile(
