@@ -19,54 +19,40 @@ class _RegisterPetScreenState extends State<RegisterPetScreen> {
 
   bool _isLoading = false;
 
-  Future<void> _savePetData() async {
+  Future<void> _registerPet() async {
+    if (_petNameController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('El nombre de la mascota no puede estar vacío')),
+      );
+      return;
+    }
+
     setState(() {
       _isLoading = true;
     });
 
     try {
-      String petName = _petNameController.text.trim();
-      String birthday = _birthdayController.text.trim();
-      String description = _descriptionController.text.trim();
-
-      if (petName.isEmpty || birthday.isEmpty || description.isEmpty) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Todos los campos son obligatorios.')),
-        );
-        return;
-      }
-
-      if (!RegExp(r'^\d{4}-\d{2}-\d{2}$').hasMatch(birthday)) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-              content: Text('El formato de la fecha debe ser AAAA-MM-DD.')),
-        );
-        return;
-      }
-
-      await FirebaseFirestore.instance.collection('mascotas').doc(
-          widget.userEmail).set({
-        'userEmail': widget.userEmail,
-        'petName': petName,
-        'birthday': birthday,
-        'description': description,
-        'level': 1,
-        'experience': 0,
-        'energy': 100,
-        'happiness': 100,
+      await FirebaseFirestore.instance
+          .collection('mascotas')
+          .doc(widget.userEmail)
+          .set({
+        'petName': _petNameController.text,
+        'birthday': _birthdayController.text,
+        'description': _descriptionController.text,
+        'nivel': 1,
+        'experiencia': 0,
+        'energia': 100,
+        'felicidad': 100,
+        'maxExperiencia': 100,
+        'maxEnergia': 100,
+        'maxFelicidad': 100,
+        'imagenActual': 'assets/Images/mascota.principal.png',
       });
 
-      // Simula la pantalla de carga por 5 segundos
-      await Future.delayed(Duration(seconds: 2));
-
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-            builder: (context) => HomeScreen(userEmail: widget.userEmail)),
-      );
+      Navigator.pop(context); // Return to the previous screen
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error al guardar la mascota: $e')),
+        SnackBar(content: Text('Error al registrar la mascota: $e')),
       );
     } finally {
       setState(() {
@@ -78,34 +64,93 @@ class _RegisterPetScreenState extends State<RegisterPetScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Registrar Mascota')),
-      drawer: AppDrawer(userEmail: widget.userEmail), // Integra el menú
+      appBar: AppBar(
+        title: const Text(
+          'Registrar Mascota',
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+        ),
+        backgroundColor: const Color(0xFF00BCD4),
+      ),
       body: _isLoading
-          ? Center(child: CircularProgressIndicator())
-          : Padding(
-        padding: EdgeInsets.all(16.0),
+          ? const Center(child: CircularProgressIndicator())
+          : SingleChildScrollView(
+        padding: const EdgeInsets.all(16.0),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            TextField(
+            _buildTextField(
+              label: 'Nombre de la Mascota',
               controller: _petNameController,
-              decoration: InputDecoration(labelText: 'Nombre de la Mascota'),
+              hint: 'Ejemplo: Firulais',
             ),
-            TextField(
+            const SizedBox(height: 16),
+            _buildTextField(
+              label: 'Cumpleaños (Opcional)',
               controller: _birthdayController,
-              decoration: InputDecoration(labelText: 'Cumpleaños (AAAA-MM-DD)'),
+              hint: 'Ejemplo: 12/05/2020',
             ),
-            TextField(
+            const SizedBox(height: 16),
+            _buildTextField(
+              label: 'Descripción',
               controller: _descriptionController,
-              decoration: InputDecoration(labelText: 'Descripción'),
+              hint: 'Describe a tu mascota...',
+              maxLines: 3,
             ),
-            SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: _savePetData,
-              child: Text('Registrar Mascota'),
+            const SizedBox(height: 30),
+            Center(
+              child: ElevatedButton(
+                onPressed: _registerPet,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.white,
+                  side: const BorderSide(color: Color(0xFF00BCD4), width: 2),
+                  minimumSize: const Size(200, 50),
+                ),
+                child: const Text(
+                  'Registrar',
+                  style: TextStyle(
+                    color: Color(0xFF00BCD4),
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
             ),
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildTextField({
+    required String label,
+    required TextEditingController controller,
+    String? hint,
+    int maxLines = 1,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: const TextStyle(
+            fontWeight: FontWeight.bold,
+            color: Color(0xFF00BCD4),
+          ),
+        ),
+        const SizedBox(height: 8),
+        TextField(
+          controller: controller,
+          maxLines: maxLines,
+          decoration: InputDecoration(
+            hintText: hint,
+            filled: true,
+            fillColor: Colors.white,
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10),
+              borderSide: const BorderSide(color: Color(0xFF00BCD4)),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
