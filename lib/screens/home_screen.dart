@@ -1,7 +1,10 @@
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../providers/mascota_provider.dart';
 import '../widgets/app_drawer.dart';
+
 
 class Mascota {
   final String petName;
@@ -102,8 +105,10 @@ class HomeScreen extends StatefulWidget {
 class _Vista1ScreenState extends State<HomeScreen> {
   Mascota? miMascota;
   Timer? _timer;
+  String? _petName;
   late StreamSubscription<
       DocumentSnapshot<Map<String, dynamic>>> _mascotaStream;
+
 
   @override
   void initState() {
@@ -120,10 +125,12 @@ class _Vista1ScreenState extends State<HomeScreen> {
       if (snapshot.exists) {
         setState(() {
           miMascota = Mascota.fromMap(snapshot.data()!);
+          _petName = miMascota!.petName; // Asignar el valor aquí
         });
       } else {
         setState(() {
           miMascota = null;
+          _petName = null; // Asignar el valor aquí
         });
       }
     });
@@ -163,6 +170,8 @@ class _Vista1ScreenState extends State<HomeScreen> {
         miMascota!.realizarAccion(accion);
       });
 
+      Provider.of<MascotaProvider>(context, listen: false).alimentarMascota();
+
       _timer = Timer(const Duration(seconds: 3), () {
         setState(() {
           miMascota!.imagenActual =
@@ -191,6 +200,8 @@ class _Vista1ScreenState extends State<HomeScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
+              Text('Nombre: ${_petName ?? 'No disponible'}',
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
               Text('Nivel: ${miMascota!.nivel}',
                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
               const SizedBox(height: 20),
@@ -214,6 +225,32 @@ class _Vista1ScreenState extends State<HomeScreen> {
               _buildStats(
                   'Energía', miMascota!.energia / miMascota!.maxEnergia),
               const SizedBox(height: 20),
+              Consumer<MascotaProvider>(
+                builder: (context, provider, child) {
+                  if (provider.mostrarMensajeAlimentacion) {
+                    return FutureBuilder(
+                      future: Future.delayed(const Duration(seconds: 2)),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState == ConnectionState.done) {
+                          provider.reiniciarAlimentaciones();
+                          return Container();
+                        } else {
+                          return Text(
+                            '3 Streaks',
+                            style: TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFF00BCD4),
+                            ),
+                          );
+                        }
+                      },
+                    );
+                  } else {
+                    return Container();
+                  }
+                },
+              ),
               _buildActionButtons(),
             ],
           ),

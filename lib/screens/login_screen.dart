@@ -2,6 +2,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:proyect_final/services/auth_service.dart';
 import 'home_screen.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -138,16 +141,50 @@ class Titulo extends StatelessWidget {
   }
 }
 
-class ImagenLogin extends StatelessWidget {
+class ImagenLogin extends StatefulWidget {
+  @override
+  _ImagenLoginState createState() => _ImagenLoginState();
+}
+
+class _ImagenLoginState extends State<ImagenLogin> {
+  bool _isScaled = false;
+
+  @override
+  void initState() {
+    super.initState();
+    Future.delayed(Duration.zero, () {
+      setState(() {
+        _isScaled = true;
+      });
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Image.asset(
-      'assets/Images/icon-login.png',
-      width: 130,
-      height: 130,
+    return Center(
+      child: AnimatedContainer(
+        duration: Duration(seconds: 2),
+        curve: Curves.easeInOut,
+        width: _isScaled ? 200 : 150,
+        height: _isScaled ? 200 : 150,
+        onEnd: () {
+          setState(() {
+            _isScaled = !_isScaled;
+          });
+        },
+        child: Image.network(
+          'https://media.tenor.com/mP0SLXgz71QAAAAj/peachcat-cat.gif',
+          errorBuilder: (context, error, stackTrace) =>
+              Icon(Icons.error, size: 50, color: Colors.red),
+        ),
+      ),
     );
   }
 }
+
+
+
+
 
 class CampoEmail extends StatelessWidget {
   final TextEditingController _emailController;
