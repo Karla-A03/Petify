@@ -49,10 +49,13 @@ class _RegisterPetScreenState extends State<RegisterPetScreen> {
         'imagenActual': 'assets/Images/mascota.principal.png',
       });
 
-      Navigator.pop(context); // Return to the previous screen
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => HomeScreen(userEmail: widget.userEmail)),
+      );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error al registrar la mascota: $e')),
+        SnackBar(content: Text('Error al guardar la mascota: $e')),
       );
     } finally {
       setState(() {
