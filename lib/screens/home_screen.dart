@@ -22,10 +22,16 @@ class Mascota {
 
 
   static const Map<String, String> imagenesPorAccion = {
-    'alimentar': 'assets/Images/mascota.comiendo.png',
-    'jugar': 'assets/Images/mascota.jugando.png',
-    'dormir': 'assets/Images/mascota.durmiendo.png',
+  'alimentar': 'assets/Images/mascota.comiendo.png',
+  'jugar': 'assets/Images/mascota.jugando.png',
+  'dormir': 'assets/Images/mascota.durmiendo.png',
+  'calor': 'assets/Images/mascota.sol.png', 
+  'lluvia ligera': 'assets/Images/mascota.lluvia.jpg', 
+  'normal': 'assets/Images/mascota.principal.png', 
+  'muy nuboso': 'assets/Images/mascota.nublado.png',
+  'nubes': 'assets/Images/mascota.nubes.jpg',
   };
+
 
   Mascota({
     required this.petName,
@@ -123,34 +129,47 @@ class _Vista1ScreenState extends State<HomeScreen> {
     _getWeatherAndLocation();
   }
 
-  // Método para obtener la ubicación y el clima
   Future<void> _getWeatherAndLocation() async {
-    setState(() {
-      _isLoading = true; // Mostrar el indicador de carga
-    });
+  setState(() {
+    _isLoading = true;
+  });
 
-    // Obtener la ubicación
-    Position? position = await obtenerUbicacion();
-    if (position != null) {
-      _ubicacion = 'Lat: ${position.latitude}, Lon: ${position.longitude}';
+  Position? position = await obtenerUbicacion();
+  if (position != null) {
+    _ubicacion = 'Lat: ${position.latitude}, Lon: ${position.longitude}';
 
-      // Obtener el clima usando la ubicación
-      Map<String, dynamic>? climaData = await obtenerClima(position.latitude, position.longitude);
-      if (climaData != null) {
-        _clima = 'Temperatura: ${climaData['main']['temp']}°C\n'
-            'Condición: ${climaData['weather'][0]['description']}';
+    Map<String, dynamic>? climaData = await obtenerClima(position.latitude, position.longitude);
+    if (climaData != null) {
+      _clima = 'Temperatura: ${climaData['main']['temp']}°C\n'
+          'Condición: ${climaData['weather'][0]['description']}';
+
+      double temperatura = climaData['main']['temp'];
+      String condicionClimatica = climaData['weather'][0]['description'];
+
+      if (temperatura > 30) {
+        miMascota?.cambiarImagen('calor');
+      } else if (temperatura < 10) {
+        miMascota?.cambiarImagen('lluvia ligera');
+      } else if (condicionClimatica.toLowerCase().contains('muy nuboso')) {
+        miMascota?.cambiarImagen('muy nuboso');
+        } else if (condicionClimatica.toLowerCase().contains('nubes')) {
+        miMascota?.cambiarImagen('nubes'); 
       } else {
-        _clima = 'No se pudo obtener el clima';
+        miMascota?.cambiarImagen('normal');
       }
     } else {
-      _ubicacion = 'No se pudo obtener la ubicación';
       _clima = 'No se pudo obtener el clima';
     }
-
-    setState(() {
-      _isLoading = false; // Ocultar el indicador de carga
-    });
+  } else {
+    _ubicacion = 'No se pudo obtener la ubicación';
+    _clima = 'No se pudo obtener el clima';
   }
+
+  setState(() {
+    _isLoading = false;
+  });
+}
+
 
   void _cargarMascota() {
     _mascotaStream = FirebaseFirestore.instance
