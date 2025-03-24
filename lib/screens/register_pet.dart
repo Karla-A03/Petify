@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import '../widgets/app_drawer.dart';
 import 'home_screen.dart';
 
 class RegisterPetScreen extends StatefulWidget {
   final String userEmail;
 
-  RegisterPetScreen({required this.userEmail});
+  const RegisterPetScreen({super.key, required this.userEmail});
 
   @override
   _RegisterPetScreenState createState() => _RegisterPetScreenState();

@@ -4,6 +4,8 @@ import 'login_screen.dart';
 import 'register_pet.dart';  // Importa RegisterPetScreen
 
 class RegisterScreen extends StatefulWidget {
+  const RegisterScreen({super.key});
+
   @override
   _RegisterScreenState createState() => _RegisterScreenState();
 }
@@ -145,7 +147,7 @@ class CampoInput extends StatelessWidget {
   final String label;
   final bool isPassword;
 
-  const CampoInput({
+  const CampoInput({super.key, 
     required this.controller,
     required this.label,
     required this.isPassword,
@@ -187,7 +189,7 @@ class CampoInput extends StatelessWidget {
 }
 
 class Titulo extends StatelessWidget {
-  const Titulo();
+  const Titulo({super.key});
 
   @override
   Widget build(BuildContext context) {

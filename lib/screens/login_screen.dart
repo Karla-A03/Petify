@@ -1,12 +1,11 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:proyect_final/services/auth_service.dart';
-import 'home_screen.dart';
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 
 
 class LoginScreen extends StatefulWidget {
+  const LoginScreen({super.key});
+
   @override
   _LoginScreenState createState() => _LoginScreenState();
 }
@@ -124,6 +123,8 @@ class _LoginScreenState extends State<LoginScreen> {
 }
 
 class Titulo extends StatelessWidget {
+  const Titulo({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -142,6 +143,8 @@ class Titulo extends StatelessWidget {
 }
 
 class ImagenLogin extends StatefulWidget {
+  const ImagenLogin({super.key});
+
   @override
   _ImagenLoginState createState() => _ImagenLoginState();
 }
@@ -189,7 +192,7 @@ class _ImagenLoginState extends State<ImagenLogin> {
 class CampoEmail extends StatelessWidget {
   final TextEditingController _emailController;
 
-  CampoEmail(this._emailController);
+  const CampoEmail(this._emailController, {super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -228,7 +231,7 @@ class CampoEmail extends StatelessWidget {
 class CampoPassword extends StatelessWidget {
   final TextEditingController _passwordController;
 
-  CampoPassword(this._passwordController);
+  const CampoPassword(this._passwordController, {super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -266,6 +269,8 @@ class CampoPassword extends StatelessWidget {
 }
 
 class BotonRegistro extends StatelessWidget {
+  const BotonRegistro({super.key});
+
   @override
   Widget build(BuildContext context) {
     return TextButton(
@@ -283,7 +288,7 @@ class BotonRegistro extends StatelessWidget {
 class TextoPetify extends StatelessWidget {
   final double _opacity;
 
-  TextoPetify(this._opacity);
+  const TextoPetify(this._opacity, {super.key});
 
   @override
   Widget build(BuildContext context) {

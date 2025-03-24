@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class AppDrawer extends StatelessWidget {
   final String userEmail; // Recibe el correo del usuario
 
-  AppDrawer({required this.userEmail}); // Constructor con el email
+  const AppDrawer({super.key, required this.userEmail}); // Constructor con el email
 
   @override
   Widget build(BuildContext context) {
