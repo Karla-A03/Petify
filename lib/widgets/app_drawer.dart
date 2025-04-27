@@ -68,6 +68,23 @@ class AppDrawer extends StatelessWidget {
               );
             },
           ),
+          // Nueva opción para programar notificaciones
+          ListTile(
+            leading: Icon(Icons.notifications, color: Color(0xFF50C2C9)),
+            title: Text(
+              'Programar Notificación',
+              style: TextStyle(
+                fontSize: 18,
+                fontFamily: 'ZenKurenaido',
+              ),
+            ),
+            onTap: () {
+              Navigator.pushNamed(
+                context,
+                '/programar_notificacion', // Ruta a la pantalla de notificaciones
+              );
+            },
+          ),
           ListTile(
             leading: Icon(Icons.logout, color: Color(0xFF50C2C9)),
             title: Text(

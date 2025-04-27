@@ -8,8 +8,14 @@ import 'screens/register_screen.dart';
 import 'screens/home_screen.dart';
 import 'screens/register_pet.dart';
 import 'providers/mascota_provider.dart';
+import 'services/notification_service.dart';
+import 'package:timezone/data/latest.dart' as tz; // Importamos las zonas horarias
+import 'screens/programar_notificacion_screen.dart';
 
-Future <void> main() async {
+Future<void> main() async {
+  // Inicializa las zonas horarias antes de ejecutar la aplicación
+  tz.initializeTimeZones(); // Aquí se llama correctamente sin esperar un valor
+
   // Asegura que los widgets estén inicializados
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -47,6 +53,7 @@ class MyApp extends StatelessWidget {
         '/register': (context) => RegisterScreen(),
         '/home': (context) => HomeScreen(userEmail: ModalRoute.of(context)!.settings.arguments as String), // Pantalla principal, pasando correo del us
         '/register_pet': (context) => RegisterPetScreen(userEmail: ModalRoute.of(context)!.settings.arguments as String),
+        '/programar_notificacion': (context) => ProgramarNotificacionScreen(),
       },
     );
   }
