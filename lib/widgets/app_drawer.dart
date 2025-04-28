@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 class AppDrawer extends StatelessWidget {
   final String userEmail; // Recibe el correo del usuario
 
-  const AppDrawer({super.key, required this.userEmail}); // Constructor con el email
+  const AppDrawer(
+      {super.key, required this.userEmail}); // Constructor con el email
 
   @override
   Widget build(BuildContext context) {
@@ -68,8 +69,6 @@ class AppDrawer extends StatelessWidget {
               );
             },
           ),
-<<<<<<< HEAD
-=======
           // Nueva opción para programar notificaciones
           ListTile(
             leading: Icon(Icons.notifications, color: Color(0xFF50C2C9)),
@@ -87,7 +86,6 @@ class AppDrawer extends StatelessWidget {
               );
             },
           ),
->>>>>>> main
           ListTile(
             leading: Icon(Icons.logout, color: Color(0xFF50C2C9)),
             title: Text(

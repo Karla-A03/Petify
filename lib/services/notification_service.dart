@@ -9,7 +9,8 @@ class NotificationService {
   // Inicialización de la notificación
   Future<void> initialize() async {
     const AndroidInitializationSettings androidInitializationSettings =
-        AndroidInitializationSettings('@mipmap/ic_launcher'); // Ícono de la notificación
+        AndroidInitializationSettings(
+            '@mipmap/ic_launcher'); // Ícono de la notificación
     const InitializationSettings initializationSettings =
         InitializationSettings(android: androidInitializationSettings);
     await _flutterLocalNotificationsPlugin.initialize(initializationSettings);
@@ -25,10 +26,12 @@ class NotificationService {
         android: AndroidNotificationDetails(
           'your_channel_id', // ID del canal de notificación
           'your_channel_name', // Nombre del canal visible al usuario
-          channelDescription: 'your_channel_description', // Descripción del canal
+          channelDescription:
+              'your_channel_description', // Descripción del canal
           importance: Importance.high, // Importancia alta para que sea visible
           priority: Priority.high, // Prioridad alta para aparecer de inmediato
-          ticker: 'ticker', // Texto breve que se puede mostrar en la barra de estado
+          ticker:
+              'ticker', // Texto breve que se puede mostrar en la barra de estado
         ),
       ),
     );
@@ -38,7 +41,8 @@ class NotificationService {
   Future<void> zonedScheduleNotification(
       int id, String title, String body, DateTime scheduledDate) async {
     // Convertir DateTime a TZDateTime
-    tz.TZDateTime scheduledDateTime = tz.TZDateTime.from(scheduledDate, tz.local);
+    tz.TZDateTime scheduledDateTime =
+        tz.TZDateTime.from(scheduledDate, tz.local);
 
     await _flutterLocalNotificationsPlugin.zonedSchedule(
       id, // ID único de la notificación programada
@@ -49,14 +53,18 @@ class NotificationService {
         android: AndroidNotificationDetails(
           'your_channel_id', // ID del canal de notificación
           'your_channel_name', // Nombre del canal visible al usuario
-          channelDescription: 'your_channel_description', // Descripción del canal
+          channelDescription:
+              'your_channel_description', // Descripción del canal
           importance: Importance.high, // Importancia alta
           priority: Priority.high, // Prioridad alta
           ticker: 'ticker',
         ),
       ),
-      uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime, // Interpretar la fecha exacta
-      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle, // Permitir notificaciones aunque el dispositivo esté inactivo
+      uiLocalNotificationDateInterpretation:
+          UILocalNotificationDateInterpretation
+              .absoluteTime, // Interpretar la fecha exacta
+      androidScheduleMode: AndroidScheduleMode
+          .exactAllowWhileIdle, // Permitir notificaciones aunque el dispositivo esté inactivo
     );
   }
 }

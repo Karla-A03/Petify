@@ -24,17 +24,21 @@ class _ProgramarNotificacionScreenState
     tz.initializeTimeZones(); // Inicializamos las zonas horarias sin esperar un valor de retorno
 
     const AndroidInitializationSettings androidInitializationSettings =
-        AndroidInitializationSettings('@mipmap/ic_launcher'); // Ícono de la notificación
+        AndroidInitializationSettings(
+            '@mipmap/ic_launcher'); // Ícono de la notificación
     const InitializationSettings initializationSettings =
         InitializationSettings(android: androidInitializationSettings);
     await flutterLocalNotificationsPlugin.initialize(initializationSettings);
 
-    tz.setLocalLocation(tz.getLocation('America/Chicago')); // Establecer la zona horaria local
+    tz.setLocalLocation(
+        tz.getLocation('America/Chicago')); // Establecer la zona horaria local
   }
 
   // Función para programar la notificación
   Future<void> _programarNotificacion() async {
-    if (_tituloController.text.isEmpty || _cuerpoController.text.isEmpty || _horaSeleccionada == null) {
+    if (_tituloController.text.isEmpty ||
+        _cuerpoController.text.isEmpty ||
+        _horaSeleccionada == null) {
       // Si falta algún dato, mostrar un error
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Por favor complete todos los campos")),
@@ -52,7 +56,8 @@ class _ProgramarNotificacionScreenState
     );
 
     // Convertir DateTime a TZDateTime
-    tz.TZDateTime scheduledTZDateTime = tz.TZDateTime.from(scheduledDate, tz.local);
+    tz.TZDateTime scheduledTZDateTime =
+        tz.TZDateTime.from(scheduledDate, tz.local);
 
     // Llamar a zonedScheduleNotification() con los datos proporcionados por el usuario
     await flutterLocalNotificationsPlugin.zonedSchedule(
@@ -69,9 +74,13 @@ class _ProgramarNotificacionScreenState
           onlyAlertOnce: true,
         ),
       ),
-      matchDateTimeComponents: DateTimeComponents.time, // Solo programamos por hora
-      uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime, // Definimos la interpretación de la hora
-      androidScheduleMode: AndroidScheduleMode.exact, // Aquí se agrega el parámetro necesario
+      matchDateTimeComponents:
+          DateTimeComponents.time, // Solo programamos por hora
+      uiLocalNotificationDateInterpretation:
+          UILocalNotificationDateInterpretation
+              .absoluteTime, // Definimos la interpretación de la hora
+      androidScheduleMode:
+          AndroidScheduleMode.exact, // Aquí se agrega el parámetro necesario
     );
 
     ScaffoldMessenger.of(context).showSnackBar(

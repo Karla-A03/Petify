@@ -8,19 +8,15 @@ import 'screens/register_screen.dart';
 import 'screens/home_screen.dart';
 import 'screens/register_pet.dart';
 import 'providers/mascota_provider.dart';
-<<<<<<< HEAD
-
-Future <void> main() async {
-=======
 import 'services/notification_service.dart';
-import 'package:timezone/data/latest.dart' as tz; // Importamos las zonas horarias
+import 'package:timezone/data/latest.dart'
+    as tz; // Importamos las zonas horarias
 import 'screens/programar_notificacion_screen.dart';
 
 Future<void> main() async {
   // Inicializa las zonas horarias antes de ejecutar la aplicación
   tz.initializeTimeZones(); // Aquí se llama correctamente sin esperar un valor
 
->>>>>>> main
   // Asegura que los widgets estén inicializados
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -33,9 +29,11 @@ Future<void> main() async {
   FirebaseAppCheck.instance.setTokenAutoRefreshEnabled(false);
 
   runApp(
-    MultiProvider( // Agrega el MultiProvider
+    MultiProvider(
+      // Agrega el MultiProvider
       providers: [
-        ChangeNotifierProvider(create: (_) => MascotaProvider()), // Agrega el MascotaProvider
+        ChangeNotifierProvider(
+            create: (_) => MascotaProvider()), // Agrega el MascotaProvider
       ],
       child: MyApp(),
     ),
@@ -52,16 +50,16 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      initialRoute: '/login',  // Pantalla inicial
+      initialRoute: '/login', // Pantalla inicial
       routes: {
         '/login': (context) => LoginScreen(),
         '/register': (context) => RegisterScreen(),
-        '/home': (context) => HomeScreen(userEmail: ModalRoute.of(context)!.settings.arguments as String), // Pantalla principal, pasando correo del us
-        '/register_pet': (context) => RegisterPetScreen(userEmail: ModalRoute.of(context)!.settings.arguments as String),
-<<<<<<< HEAD
-=======
+        '/home': (context) => HomeScreen(
+            userEmail: ModalRoute.of(context)!.settings.arguments
+                as String), // Pantalla principal, pasando correo del us
+        '/register_pet': (context) => RegisterPetScreen(
+            userEmail: ModalRoute.of(context)!.settings.arguments as String),
         '/programar_notificacion': (context) => ProgramarNotificacionScreen(),
->>>>>>> main
       },
     );
   }
