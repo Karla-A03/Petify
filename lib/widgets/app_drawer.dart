@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:proyect_final/screens/bluetooth_visits_screen.dart';
 
 class AppDrawer extends StatelessWidget {
   final String userEmail; // Recibe el correo del usuario
@@ -99,6 +100,22 @@ class AppDrawer extends StatelessWidget {
               Navigator.pushReplacementNamed(context, '/login');
             },
           ),
+          ListTile(
+          leading: Icon(Icons.bluetooth, color: Color(0xFF50C2C9)),
+          title: Text(
+            'Visitar Mascotas',
+            style: TextStyle(
+              fontSize: 18,
+              fontFamily: 'ZenKurenaido',
+            ),
+          ),
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const BluetoothVisitsPage()),
+            );
+          },
+        ),
         ],
       ),
     );

@@ -30,6 +30,10 @@ android {
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+        multiDexEnabled true
+        compileOptions {
+            coreLibraryDesugaringEnabled true
+        }
     }
 
     buildTypes {
@@ -45,3 +49,7 @@ flutter {
     source = "../.."
 }
 apply plugin: 'com.google.gms.google-services'  // Esta línea aplica el plugin de Google Services
+
+dependencies {
+    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.0.4'
+}

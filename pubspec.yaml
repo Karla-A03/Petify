@@ -53,6 +53,7 @@ dependencies:
   path_provider: ^2.1.2
   path: ^1.8.3
   flutter_blue_plus: ^1.31.13
+  nearby_connections: ^3.0.1
 
 dev_dependencies:
   flutter_test:
