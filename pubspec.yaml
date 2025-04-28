@@ -30,6 +30,17 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+<<<<<<< HEAD
+=======
+  flutter_local_notifications: ^18.0.1
+  timezone: ^0.9.0
+  intl: ^0.18.0
+  # flutter_local_notifications:
+    #git:
+      #url: http://github.com/MaikuB/flutter_local_notifications.git
+      #path: flutter_local_notifications
+      # ref: master
+>>>>>>> main
   firebase_core: ^3.8.0
   firebase_auth: ^5.3.3
   cloud_firestore: ^5.5.0
@@ -44,6 +55,10 @@ dependencies:
   image_picker: ^1.0.4
   path_provider: ^2.1.2
   path: ^1.8.3
+<<<<<<< HEAD
+=======
+  flutter_blue_plus: ^1.31.13
+>>>>>>> main
 
 dev_dependencies:
   flutter_test:
